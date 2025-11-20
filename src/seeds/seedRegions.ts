@@ -1,0 +1,248 @@
+import { PrismaClient } from "../generated/prisma";
+
+const prisma = new PrismaClient()
+
+const main = async () => {
+    const region = await prisma.region.create({
+        data:{
+            regName:'Analamanga',
+            orientation:'Centre',
+            District:{
+                create:[
+                    {
+                        distName:'Antananarivo 1',
+                        Commune:{
+                            create:[
+                                {
+                                    comName:'Antananarivo Renivohitra'
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        distName:'Antananarivo Avaradrano',
+                        Commune:{
+                            create:[
+                                {
+                                    comName:'Ambohimangakely'
+                                },
+                                {
+                                    comName:'Ambohimanga Rova'
+                                },
+                                {
+                                    comName:'Ambohidratrimo'
+                                },
+                                {
+                                    comName:'Sabotsy Namehana'
+                                },
+                                {
+                                    comName:'Manjakandriana'
+                                },
+                                {
+                                    comName:'Talata Volonondry'
+                                },
+                                {
+                                    comName:'Ankadikely Ilafy'
+                                },
+                                {
+                                    comName:'Alasora'
+                                },
+                                {
+                                    comName:'Avaratsena'
+                                },
+                                {
+                                    comName:'Fiadanana'
+                                },
+                                {
+                                    comName:'Masindray'
+                                },
+                                {
+                                    comName:'Sadabe'
+                                },
+                                {
+                                    comName:'Ambohimanambola'
+                                },
+                                {
+                                    comName:'Anosy Avaratra'
+                                },
+                                {
+                                    comName:'Ambohitrimanjaka'
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        distName:'Antananarivo Atsimondrano',
+                        Commune:{
+                            create:[
+                                {
+                                    comName:'Alakamisy Fenoarivo'
+                                },
+                                {
+                                    comName:'Andoharanofotsy'
+                                },
+                                {
+                                    comName:'Anosizato Andrefana'
+                                },
+                                {
+                                    comName:'Ambohijanaka'
+                                },
+                                {
+                                    comName:'Ampitatafika'
+                                },
+                                {
+                                    comName:'Soalandy'
+                                },
+                                {
+                                    comName:'Itaosy'
+                                },
+                                {
+                                    comName:'Bemasoandro'
+                                },
+                                {
+                                    comName:'Bongatsara'
+                                },
+                                {
+                                    comName:'Ankadimanga'
+                                },
+                                {
+                                    comName:'Iavoloha'
+                                },
+                                {
+                                    comName:'Analamanga'
+                                },
+                                {
+                                    comName:'Tanjombato'
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        distName:'Ambohidratrimo',
+                        Commune:{
+                            create:[
+                                {
+                                    comName:'Ambohidratrimo'
+                                },
+                                {
+                                    comName:'Ivato Aeroport'
+                                },
+                                {
+                                    comName:'Talatamaty'
+                                },
+                                {
+                                    comName:'Anosiala'
+                                },
+                                {
+                                    comName:'Mahitsy'
+                                },
+                                {
+                                    comName:'Anjanadoria'
+                                },
+                                {
+                                    comName:'Ampangabe'
+                                },
+                                {
+                                    comName:'Fiakarana'
+                                },
+                                {
+                                    comName:'Iarinarivo'
+                                },
+                                {
+                                    comName:'Manjakavaradrano'
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        distName:'Ankazobe',
+                        Commune:{
+                            create:[
+                                {
+                                    comName:'Ankazobe'
+                                },
+                                {
+                                    comName:'Talata-Angavo'
+                                },
+                                {
+                                    comName:'Mangasoavina'
+                                },
+                                {
+                                    comName:'Mahavelona'
+                                },
+                                {
+                                    comName:'Kiangara'
+                                },
+                                {
+                                    comName:'Tsaramasoandro'
+                                },
+                                {
+                                    comName:'Tsaratanana'
+                                },
+                                {
+                                    comName:'Ambohitromby'
+                                },
+                                {
+                                    comName:'Fiadanana'
+                                },
+                                {
+                                    comName:'Mangasoavina'
+                                },
+                                {
+                                    comName:''
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        distName:'Manjakandriana',
+                        Commune:{
+                            create:[
+                                {
+                                    comName:'Manjakandriana'
+                                },
+                                {
+                                    comName:'Ambohibary'
+                                },
+                                {
+                                    comName:'Ambohitrolomahitsy'
+                                },
+                                {
+                                    comName:'Anjepy'
+                                },
+                                {
+                                    comName:'Antsahalalina'
+                                },
+                                {
+                                    comName:'Antsampandrano'
+                                },
+                                {
+                                    comName:'Mantasoa'
+                                },
+                                {
+                                    comName:'Sambaina'
+                                },
+                                {
+                                    comName:'Sadabe'
+                                },
+                                {
+                                    comName:'Ambatolaona'
+                                },
+                                {
+                                    comName:'Alarobia Vatosola'
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    })
+    return region
+}
+
+main().then(
+    data => {
+        console.log(data)
+    }
+)

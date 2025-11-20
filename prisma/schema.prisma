@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Absence {
+  id       String   @id @default(uuid())
+  date     DateTime
+  cause    String
+  workerId String
+  Worker   Worker   @relation(fields: [workerId], references: [id])
+}
+
+model Categorie {
+  id     String   @id @default(uuid())
+  cat    String
+  Worker Worker[]
+}
+
+model Dispense {
+  id       String   @id @default(uuid())
+  date     DateTime
+  cause    String
+  workerId String
+  Worker   Worker   @relation(fields: [workerId], references: [id])
+}
+
+model FingerPrint {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  fingerprintID Int
+  workerId      String
+  Worker        Worker   @relation(fields: [workerId], references: [id])
+}
+
+model Passage {
+  id        String   @id @default(uuid())
+  date      DateTime
+  type      String
+  workerId  String
+  createdAt DateTime @default(now())
+  Worker    Worker   @relation(fields: [workerId], references: [id])
+}
+
+model Projet {
+  id        String    @id @default(uuid())
+  siteName  String
+  client    String
+  project   String
+  siteID    String
+  createdAt DateTime  @default(now())
+  Section   Section[]
+}
+
+model Section {
+  id             String    @id @default(uuid())
+  type           String
+  previsionnelle DateTime?
+  actualisee     DateTime?
+  realisee       DateTime?
+  projetID       String
+  createdAt      DateTime  @default(now())
+  order          Int
+  Projet         Projet    @relation(fields: [projetID], references: [id], onDelete: Cascade)
+}
+
+model Worker {
+  id          String        @id @default(uuid())
+  matricule   String
+  fullName    String
+  post        String
+  catId       String
+  Absence     Absence[]
+  DailyTimer  DailyTimer[]
+  Dispense    Dispense[]
+  FingerPrint FingerPrint[]
+  Passage     Passage[]
+  Categorie   Categorie     @relation(fields: [catId], references: [id])
+}
+
+model ArtCat {
+  id        String    @id @default(uuid())
+  catName   String
+  abr       String
+  familleId String
+  Famille   Famille   @relation(fields: [familleId], references: [id], onDelete: Cascade)
+  Article   Article[]
+}
+
+model Article {
+  id       String  @id @default(uuid())
+  artName  String
+  abr      String
+  unite    String
+  quantite Decimal
+  artCatId String
+  stock    Decimal
+  ArtCat   ArtCat  @relation(fields: [artCatId], references: [id], onDelete: Cascade)
+}
+
+model Famille {
+  id      String   @id @default(uuid())
+  famName String
+  abr     String
+  ArtCat  ArtCat[]
+}
+
+model Consommable {
+  id               String         @id @default(uuid())
+  libele           String
+  consommableCatId String
+  quantite         Decimal
+  unite            String
+  ConsommableCat   ConsommableCat @relation(fields: [consommableCatId], references: [id], onDelete: Cascade)
+}
+
+model ConsommableCat {
+  id          String        @id @default(uuid())
+  nomCat      String
+  Consommable Consommable[]
+}
+
+model DailyTimer {
+  id           String   @id @default(uuid())
+  date         DateTime
+  totalMs      BigInt
+  WorkerId     String
+  differentiel BigInt
+  Worker       Worker   @relation(fields: [WorkerId], references: [id])
+}
+
+model User {
+  id          String      @id @default(uuid())
+  userName    String      @unique
+  email       String      @unique
+  depId       String
+  password    String
+  post        String
+  Departement Departement @relation(fields: [depId], references: [id], onDelete: Cascade)
+}
+
+model Commune {
+  id         String      @id @default(uuid())
+  comName    String
+  DistrictId String
+  District   District    @relation(fields: [DistrictId], references: [id], onDelete: Cascade)
+  Fokontany  Fokontany[]
+}
+
+model District {
+  id       String    @id @default(uuid())
+  distName String
+  RegionId String
+  Commune  Commune[]
+  Region   Region    @relation(fields: [RegionId], references: [id], onDelete: Cascade)
+}
+
+model Fokontany {
+  id        String  @id @default(uuid())
+  fokoName  String
+  CommuneId String
+  Commune   Commune @relation(fields: [CommuneId], references: [id], onDelete: Cascade)
+}
+
+model Region {
+  id          String     @id @default(uuid())
+  regName     String
+  orientation String
+  District    District[]
+}
+
+model Departement {
+  id      String @id @default(uuid())
+  depName String
+  User    User[]
+}
+
+enum SectionType {
+  lancement
+  achats
+  SHEQ
+  depart
+  debut_travaux
+  fin_travaux
+  rapport_send
+  pv_received
+}
