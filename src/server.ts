@@ -3,7 +3,8 @@ import { PrismaClient } from "./generated/prisma";
 import cors from 'cors'
 import { startOfDay } from "date-fns";
 import { countWorkTime } from "./functions/passagesFunctions";
-import { login } from "./functions/userFunctions";
+import { generateToken, login } from "./functions/userFunctions";
+import path from 'path';
 
 const app = express();
 const PORT = 3600;
@@ -13,6 +14,8 @@ const prisma = new PrismaClient()
 // Middleware pour JSON
 app.use(express.json())
 app.use(cors());
+
+app.use('/images', express.static(path.join(__dirname, '/avatars')));
 
 // Route de test
 app.get("/", (req: Request, res: Response) => {
@@ -298,18 +301,166 @@ app.post('/exportTime', async (req,res) => {
 //Login
 app.post('/login', async (req,res) => {
   const { userName, password } = req.body
+  const token = generateToken()
   const result = await login(userName, password)
   if(!result.ok){
     res.json({
-      data :'login denied'
+      message:'login denied',
+        user:null,
+        token:null
     })
   }
   else{
+    const isLogedIn = await prisma.token.findFirst({
+      where:{
+        userId:result.safeUser?.id    
+      }
+    })
+    if(isLogedIn){
+      res.json({
+        message:'Already logged In',
+        user:result.safeUser,
+        token:isLogedIn.value
+      })
+    }
+    else{
+      let l = ''
+      if (result.safeUser) {
+        l = result.safeUser.id
+      }
+      const newToken = await prisma.token.create({
+        data:{
+          value:token,
+          userId:l
+        }
+      })
+      res.json({
+        message:'Login accepted',
+        user:result.safeUser,
+        token:newToken.value
+      })
+    }
+  }
+})
+
+app.post('/checkToken', async (req,res) => {
+  const { value } = req.body
+  const token = await prisma.token.findFirst({
+    where:{
+      value
+    }
+  })
+  if(token){
+    const user = await prisma.user.findFirst({
+      where:{
+        id:token.userId
+      },
+      include:{
+        Departement:true
+      },
+      omit:{
+        password:true
+      }
+    })
+    if(user){
+      res.json({
+        message:'Login accepted',
+        user:user,
+        token:value
+      })
+    }
+    else{
+      res.json({
+        message:'login denied',
+        user:null,
+        token:null
+      })
+    }
+  }
+  else{
     res.json({
-      data:result.safeUser
+      message:'login denied',
+      user:null,
+      token:null
     })
   }
 })
+
+app.post('/logout', async (req,res) => {
+  const { value } = req.body
+  const t = await prisma.token.findFirst({
+    where:{
+      value
+    }
+  })
+  if(t){
+    await prisma.token.delete({
+      where:{
+        id:t.id
+      }
+    })
+    res.json({data:'token deleted'})
+  }
+  else{
+    res.json({data:'token introuvable'})
+  }
+})
+
+//Users
+app.get('/usersByDeps', async (req,res) => {
+  const deps = await prisma.departement.findMany({
+    include:{
+      User:true
+    }
+  })
+  res.json(deps)
+})
+
+
+
+//Messages
+app.post('/createPrivateChat', async (req,res) => {
+  const { id1, id2 } = req.body
+  const newChat = await prisma.chat.create({
+    data:{
+      type:"PRIVATE",
+      ChatMember:{
+        create:[
+          { userId:id1 },
+          { userId:id2 },
+        ]
+      }
+    }
+  })
+  res.json(newChat)
+})
+
+app.post('/getPrivateChat', async (req,res) => {
+  const { id } = req.body
+  const chat = await prisma.chat.findFirst({
+    where:{
+      id
+    },
+    include:{
+      Message:{
+        include:{
+          ChatMember:{
+            include:{
+              User:{
+                omit:{
+                  password:true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  res.json(chat)
+})
+
+
 
 // Démarrage du serveur
 app.listen(PORT, '0.0.0.0' ,() => {

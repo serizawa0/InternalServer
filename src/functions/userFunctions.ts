@@ -7,6 +7,9 @@ export async function login(userName: string, password: string) {
   const user = await prisma.user.findUnique({
     where:{
         userName
+    },
+    include:{
+      Departement:true
     }
   });
 
@@ -21,4 +24,11 @@ export async function login(userName: string, password: string) {
   }
 
   return { ok: true, safeUser };
+}
+
+
+import crypto from "crypto";
+
+export function generateToken() {
+  return crypto.randomBytes(32).toString("hex"); // 64 chars
 }

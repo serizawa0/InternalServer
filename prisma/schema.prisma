@@ -135,13 +135,16 @@ model DailyTimer {
 }
 
 model User {
-  id          String      @id @default(uuid())
-  userName    String      @unique
-  email       String      @unique
+  id          String       @id @default(uuid())
+  userName    String       @unique
+  email       String       @unique
   depId       String
   password    String
   post        String
-  Departement Departement @relation(fields: [depId], references: [id], onDelete: Cascade)
+  avatarFile  String
+  ChatMember  ChatMember[]
+  Token       Token[]
+  Departement Departement  @relation(fields: [depId], references: [id], onDelete: Cascade)
 }
 
 model Commune {
@@ -180,6 +183,68 @@ model Departement {
   User    User[]
 }
 
+model Service {
+  id       String @id
+  servName String
+}
+
+model Token {
+  id     String @id @default(uuid())
+  value  String
+  userId String
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Chat {
+  id         String       @id @default(uuid())
+  type       ChatType
+  name       String?
+  createdAt  DateTime     @default(now())
+  ChatMember ChatMember[]
+  Message    Message[]
+}
+
+model ChatMember {
+  id      String         @id  @default(uuid())
+  chatId  String
+  userId  String
+  role    ChatMemberRole @default(MEMBER)
+  Chat    Chat           @relation(fields: [chatId], references: [id])
+  User    User           @relation(fields: [userId], references: [id])
+  Message Message[]
+}
+
+model ChecklistItem {
+  id        String  @id  @default(uuid())
+  messageId String
+  label     String
+  checked   Boolean @default(false)
+  Message   Message @relation(fields: [messageId], references: [id])
+}
+
+model FileUpload {
+  id        String  @id  @default(uuid())
+  messageId String  @unique
+  fileName  String
+  fileType  String
+  fileSize  Int
+  url       String
+  Message   Message @relation(fields: [messageId], references: [id])
+}
+
+model Message {
+  id            String          @id  @default(uuid())
+  chatId        String
+  senderId      String
+  createdAt     DateTime        @default(now())
+  type          MessageType
+  text          String?
+  ChecklistItem ChecklistItem[]
+  FileUpload    FileUpload?
+  Chat          Chat            @relation(fields: [chatId], references: [id])
+  ChatMember    ChatMember      @relation(fields: [senderId], references: [id])
+}
+
 enum SectionType {
   lancement
   achats
@@ -189,4 +254,21 @@ enum SectionType {
   fin_travaux
   rapport_send
   pv_received
+}
+
+enum ChatMemberRole {
+  MEMBER
+  ADMIN
+}
+
+enum ChatType {
+  PRIVATE
+  GROUP
+}
+
+enum MessageType {
+  TEXT
+  CHECKLIST
+  FILE
+  IMAGE
 }
