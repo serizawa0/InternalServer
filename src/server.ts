@@ -410,10 +410,14 @@ app.post('/logout', async (req,res) => {
 app.get('/usersByDeps', async (req,res) => {
   const deps = await prisma.departement.findMany({
     include:{
-      User:true
+      User:{
+        omit:{
+          password:true
+        }
+      }
     }
   })
-  res.json(deps)
+  res.json((deps))
 })
 
 
@@ -421,6 +425,7 @@ app.get('/usersByDeps', async (req,res) => {
 //Messages
 app.post('/createPrivateChat', async (req,res) => {
   const { id1, id2 } = req.body
+  console.log('creation')
   const newChat = await prisma.chat.create({
     data:{
       type:"PRIVATE",
@@ -432,14 +437,23 @@ app.post('/createPrivateChat', async (req,res) => {
       }
     }
   })
+  console.log('new Chat')
   res.json(newChat)
 })
 
 app.post('/getPrivateChat', async (req,res) => {
-  const { id } = req.body
+  const { id1, id2 } = req.body
   const chat = await prisma.chat.findFirst({
     where:{
-      id
+      type:"PRIVATE",
+      AND:[
+        {
+          ChatMember:{ some:{ userId:id1 } }
+        },
+        {
+          ChatMember:{ some:{ userId:id2 } }
+        }
+      ]
     },
     include:{
       Message:{
@@ -458,6 +472,29 @@ app.post('/getPrivateChat', async (req,res) => {
     }
   })
   res.json(chat)
+})
+
+app.post('/checkPrivateChat', async (req,res) => {
+  const { id1,id2 } = req.body
+  const chat = await prisma.chat.findFirst({
+    where:{
+      type:"PRIVATE",
+      AND:[
+        {
+          ChatMember:{ some:{ userId:id1 } }
+        },
+        {
+          ChatMember:{ some:{ userId:id2 } }
+        }
+      ]
+    }
+  })
+  if(chat){
+    res.json({data:1})
+  }
+  else{
+    res.json({data:0})
+  }
 })
 
 

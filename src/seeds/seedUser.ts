@@ -4,16 +4,16 @@ import brcypt from 'bcrypt'
 const prisma = new PrismaClient()
 
 const main = async () => {
-    const hashed = await brcypt.hash('ramaroson', 12)
+    const hashed = await brcypt.hash('serizawa', 12)
     // console.log(hashed)
     const user = await prisma.user.create({
         data:{
-            email:'ramarosoncathia@gmail.com',
+            email:'gbl.itmanagement@gmail.com',
             password:hashed,
-            post:'Responsable Projet',
-            userName:'NdremaPoun',
-            depId:'660b78c4-c19f-4616-8efb-96da03f2c0b6',
-            avatarFile:'avatar1.jpeg'
+            post:'Responsable',
+            userName:'Serizawa',
+            depId:'5cefb4e8-346c-433c-99c3-093c82aa5787',
+            avatarFile:'avatar0.jpeg'
         }
     })
     return user

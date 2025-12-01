@@ -16,13 +16,13 @@ const main = async (userId:string, date:Date) => {
             id:passage.id
         },
         data:{
-            createdAt:new Date('2025-11-25T05:15:00')
+            createdAt:new Date('2025-11-25T03:15:00')
         }
     })
     return 'okey'
 }
 
-main('ce920ee4-7d7b-4552-9d77-37f1c229f4c1', new Date('2025-11-25')).then(
+main('036144d5-44f4-4f4c-ac57-bccb82b888da', new Date('2025-11-25')).then(
     data => {
         console.log(data)
     }
